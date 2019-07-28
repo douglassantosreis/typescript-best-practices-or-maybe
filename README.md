@@ -5,10 +5,10 @@ To tentando aprender TypeScript, então não julgue me julgue haha.
 
 O que esta sendo usado:
 
-Node
-Typescript
-Express
-Sequelize
-Postgres
-Morgan
-http
+Node\n
+Typescript\n
+Express\n
+Sequelize\n
+Postgres\n
+Morgan\n
+http\n
