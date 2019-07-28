@@ -1,13 +1,12 @@
 module.exports = {
-    env: 'test',
-    db: 'ts-api-tes',
+    env: 'development',
+    db: 'ts-api',
     dialect: 'postgres',
-    username: 'postgres',
-    password: 'pgroot',
+    username: 'douglas.reis',
+    password: 'root',
     host: 'localhost',
     serverPort: '3000',
     pgPort: 5432,
-    //dbUrl: 'postgres://postgres.pgroot@localhost:5432/ts-api',
-    dbUrl: '${dialect}://${username}.${password}@${host}:${pgPort}/${db}',
+    dbUrl: 'postgres://douglas.reis:root@localhost:5432/ts-api',
     secret: 'S3cr3t'
 };
