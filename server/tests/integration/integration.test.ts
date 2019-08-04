@@ -1,13 +1,15 @@
 import { app, request, expect } from './config/helpers';
 import * as HTTPStatus from 'http-status';
+import * as jwt from 'jwt-simple';
 
 describe('Teste de integracão', () => {
 
     'use strict';
-    //const config = require('../../config')();
+    const config = require('../../config/env/config')();
     const model = require('../../models');
 
     let id;
+    let token;
 
     const userTest = {
         id: id,
@@ -33,8 +35,42 @@ describe('Teste de integracão', () => {
         .then(user =>{
             model.User.create(userTest)
             .then(() =>{
+                token = jwt.encode({id: user.id}, config.secret)
                 done();
             });
+        })
+    });
+
+    describe('POST /token', () =>{
+        it('deve retornar um JWT', done => {
+            const credentials = {
+                email: userDefault.email,
+                password: userDefault.password
+            };
+            request(app)
+                .post('/token')
+                .send(credentials)
+                .end((err, res) =>{
+                    expect(res.status).to.equal(HTTPStatus.OK);
+                    expect(res.body.token).to.equal(`${token}`);
+                    done(err);
+                })
+        });
+
+        it('Não deve gerar o token', done =>{
+            const credentials = {
+                email: "aaa",
+                password: "bbb"
+            };
+            request(app)
+                .post('/token')
+                .send(credentials)
+                .end((err, res) =>{
+                    expect(res.status).to.equal(HTTPStatus.UNAUTHORIZED);
+                    expect(res.body).to.empty;
+                    done(err);
+                })
+            
         })
     });
 
@@ -63,6 +99,8 @@ describe('Teste de integracão', () => {
                         'id', 'name', 'email', 'password'
                     ]);
                     id = res.body.payload.id;
+                    console.log(res.body.payload);
+
                     done(error);
                 });
         });
@@ -91,6 +129,7 @@ describe('Teste de integracão', () => {
 
     describe('PUT /api/users/:id/update', () => {
         it('Deve atualizar um usuário', done => {
+            console.log(userTest);
             const user = {
                 name: 'TestUpdate',
                 email: 'update@email.com.br'
@@ -110,6 +149,7 @@ describe('Teste de integracão', () => {
 
     describe('DELETE /api/users/:id/destroy', () => {
         it('Deve deletar um usuário', done => {
+            console.log(userTest);
             request(app)
                 .delete(`/api/users/${userTest.id}/destroy`)
                 .end((error, res) => {

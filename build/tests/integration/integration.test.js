@@ -2,11 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var helpers_1 = require("./config/helpers");
 var HTTPStatus = require("http-status");
+var jwt = require("jwt-simple");
 describe('Teste de integracão', function () {
     'use strict';
-    //const config = require('../../config')();
+    var config = require('../../config/env/config')();
     var model = require('../../models');
     var id;
+    var token;
     var userTest = {
         id: id,
         name: 'Usuário Teste',
@@ -29,7 +31,38 @@ describe('Teste de integracão', function () {
             .then(function (user) {
             model.User.create(userTest)
                 .then(function () {
+                token = jwt.encode({ id: user.id }, config.secret);
                 done();
+            });
+        });
+    });
+    describe('POST /token', function () {
+        it('deve retornar um JWT', function (done) {
+            var credentials = {
+                email: userDefault.email,
+                password: userDefault.password
+            };
+            helpers_1.request(helpers_1.app)
+                .post('/token')
+                .send(credentials)
+                .end(function (err, res) {
+                helpers_1.expect(res.status).to.equal(HTTPStatus.OK);
+                helpers_1.expect(res.body.token).to.equal("" + token);
+                done(err);
+            });
+        });
+        it('Não deve gerar o token', function (done) {
+            var credentials = {
+                email: "aaa",
+                password: "bbb"
+            };
+            helpers_1.request(helpers_1.app)
+                .post('/token')
+                .send(credentials)
+                .end(function (err, res) {
+                helpers_1.expect(res.status).to.equal(HTTPStatus.UNAUTHORIZED);
+                helpers_1.expect(res.body).to.empty;
+                done(err);
             });
         });
     });
@@ -57,6 +90,7 @@ describe('Teste de integracão', function () {
                     'id', 'name', 'email', 'password'
                 ]);
                 id = res.body.payload.id;
+                console.log(res.body.payload);
                 done(error);
             });
         });
@@ -83,6 +117,7 @@ describe('Teste de integracão', function () {
     });
     describe('PUT /api/users/:id/update', function () {
         it('Deve atualizar um usuário', function (done) {
+            console.log(userTest);
             var user = {
                 name: 'TestUpdate',
                 email: 'update@email.com.br'
@@ -101,6 +136,7 @@ describe('Teste de integracão', function () {
     });
     describe('DELETE /api/users/:id/destroy', function () {
         it('Deve deletar um usuário', function (done) {
+            console.log(userTest);
             helpers_1.request(helpers_1.app)
                 .delete("/api/users/" + userTest.id + "/destroy")
                 .end(function (error, res) {

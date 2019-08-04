@@ -41,7 +41,7 @@ class User implements IUser{
         });
     }
     delete(id: number){
-        return model.User.delete({
+        return model.User.destroy({
             where: {id}
         });
     }

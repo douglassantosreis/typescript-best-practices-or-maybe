@@ -33,7 +33,7 @@ var User = /** @class */ (function () {
         });
     };
     User.prototype.delete = function (id) {
-        return model.User.delete({
+        return model.User.destroy({
             where: { id: id }
         });
     };
